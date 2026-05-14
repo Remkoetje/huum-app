@@ -170,7 +170,7 @@ const OFFSET_OPTS=[{v:-120,l:'2 uur eerder'},{v:-90,l:'1,5 uur eerder'},{v:-60,l
   {v:45,l:'45 min later'},{v:60,l:'1 uur later'},{v:90,l:'1,5 uur later'},{v:120,l:'2 uur later'}];
 
 let connected=false,lightOn=false,saunaOn=false,refreshTimer=null,nextId=1;
-let schedules=[],sunTimes={sunrise:null,sunset:null},userLat=52.37,userLon=4.9;
+let schedules=[],sunTimes={sunrise:null,sunset:null},userLat=52.3851,userLon=5.1954;
 
 const sc=k=>{try{return localStorage.getItem(k)}catch(_){return null}};
 const ss=(k,v)=>{try{localStorage.setItem(k,v)}catch(_){}};
@@ -195,7 +195,7 @@ async function doLogin(){
       saveCreds(email,pw);connected=true;
       showScreen('main-screen');
       updateStatusUI(data);updateTime();
-      loadSchedules(email);getLocation();startRefresh();
+      loadSchedules(email);fetchSunTimes();startRefresh();
     } else showErr(data.error||'Controleer je e-mailadres en wachtwoord');
   }catch(_){showErr('Kan de server niet bereiken');}
   btn.disabled=false;btn.innerHTML='<i class="ti ti-plug"></i> Verbinden';
@@ -251,7 +251,6 @@ async function toggleLight(){
   try{await fetch(PROXY+'/light',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});}catch(_){}
 }
 
-function getLocation(){if(!navigator.geolocation)return fetchSunTimes();navigator.geolocation.getCurrentPosition(p=>{userLat=p.coords.latitude;userLon=p.coords.longitude;fetchSunTimes();},()=>fetchSunTimes());}
 
 async function fetchSunTimes(){
   try{
