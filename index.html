@@ -257,10 +257,13 @@
   <div class="section-gap">
     <div class="section-title">Verbinding</div>
     <div class="card">
-      <input type="email" id="email-input" placeholder="Email (HUUM account)" autocomplete="email">
+      <input type="email" id="email-input" placeholder="Email (HUUM account)" autocomplete="username">
       <input type="password" id="pw-input" placeholder="Wachtwoord" autocomplete="current-password">
       <button class="btn" id="connect-btn" onclick="connect()">
         <i class="ti ti-plug" aria-hidden="true"></i> Verbinden met sauna
+      </button>
+      <button class="btn" id="logout-btn" onclick="logout()" style="display:none; margin-top:-4px;">
+        <i class="ti ti-logout" aria-hidden="true"></i> Uitloggen / gegevens wissen
       </button>
       <div style="display:flex; align-items:center; gap:8px;">
         <span class="status-dot" id="conn-dot"></span>
@@ -352,6 +355,33 @@ function creds() {
   };
 }
 
+function saveCreds(email, password) {
+  try { localStorage.setItem('huum_email', email); localStorage.setItem('huum_pw', password); } catch(e) {}
+}
+
+function loadCreds() {
+  try {
+    const email = localStorage.getItem('huum_email');
+    const pw = localStorage.getItem('huum_pw');
+    if (email) document.getElementById('email-input').value = email;
+    if (pw) document.getElementById('pw-input').value = pw;
+    return !!(email && pw);
+  } catch(e) { return false; }
+}
+
+function logout() {
+  try { localStorage.removeItem('huum_email'); localStorage.removeItem('huum_pw'); } catch(e) {}
+  document.getElementById('email-input').value = '';
+  document.getElementById('pw-input').value = '';
+  document.getElementById('connect-btn').className = 'btn';
+  document.getElementById('connect-btn').innerHTML = '<i class="ti ti-plug"></i> Verbinden met sauna';
+  document.getElementById('connect-btn').disabled = false;
+  document.getElementById('logout-btn').style.display = 'none';
+  document.getElementById('conn-dot').className = 'status-dot';
+  document.getElementById('conn-status').textContent = 'Vul je gegevens in en klik verbinden';
+  connected = false;
+}
+
 function showAlert(id, msg, type) {
   const el = document.getElementById(id);
   el.className = 'alert alert-' + type;
@@ -377,10 +407,12 @@ async function connect() {
     const data = await res.json();
     if (res.ok) {
       connected = true;
+      saveCreds(email, password);
       document.getElementById('conn-dot').className = 'status-dot online';
       document.getElementById('conn-status').textContent = 'Verbonden';
       document.getElementById('connect-btn').className = 'btn btn-connected';
       document.getElementById('connect-btn').innerHTML = '<i class="ti ti-check"></i> Verbonden';
+      document.getElementById('logout-btn').style.display = 'flex';
       document.getElementById('sauna-btn').disabled = false;
       document.getElementById('light-btn').disabled = false;
       updateStatusUI(data);
@@ -544,6 +576,10 @@ function renderSchedules() {
 }
 
 renderSchedules();
+
+if (loadCreds()) {
+  connect();
+}
 </script>
 </body>
 </html>
