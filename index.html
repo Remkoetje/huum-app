@@ -2,548 +2,325 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="HUUM Sauna">
+  <meta name="apple-mobile-web-app-title" content="HUUM">
   <title>HUUM Sauna</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f5f5f0;
-      color: #1a1a1a;
-      min-height: 100vh;
+    :root {
+      --bg: #f7f5f0; --card: #ffffff; --border: #e8e5de; --text: #1a1a18; --muted: #888880;
+      --amber: #d4860a; --amber-bg: #fef3dc; --blue: #1a6bb5; --blue-bg: #e8f2fb;
+      --green: #2d7a3a; --green-bg: #e6f4e8; --red: #c0392b; --red-bg: #fdecea;
+      --radius: 14px; --radius-sm: 8px;
     }
-
-    .header {
-      background: white;
-      border-bottom: 1px solid #e5e5e0;
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .header-icon { font-size: 22px; color: #EF9F27; }
-    .header h1 { font-size: 17px; font-weight: 600; }
-    .header-sub { font-size: 12px; color: #888; margin-left: auto; }
-
-    .content { max-width: 480px; margin: 0 auto; padding: 16px; }
-
-    .section-title {
-      font-size: 11px;
-      font-weight: 500;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-bottom: 8px;
-    }
-
-    .card {
-      background: white;
-      border: 1px solid #e5e5e0;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 12px;
-    }
-
-    .section-gap { margin-bottom: 20px; }
-
-    input[type="email"],
-    input[type="password"],
-    input[type="time"],
-    select {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 15px;
-      border: 1px solid #e5e5e0;
-      border-radius: 8px;
-      background: #fafaf8;
-      color: #1a1a1a;
-      margin-bottom: 8px;
-      -webkit-appearance: none;
-    }
-
-    input[type="time"] {
-      width: auto;
-      margin-bottom: 0;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      font-weight: 500;
-      border: 1px solid #e5e5e0;
-      border-radius: 8px;
-      background: white;
-      color: #1a1a1a;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-
-    .btn:active { opacity: 0.7; }
-    .btn-connected { background: #eaf3de; border-color: #c0dd97; color: #3B6D11; }
-    .btn-sauna-on { background: #faeeda; border-color: #FAC775; color: #854F0B; }
-    .btn-light-on { background: #e6f1fb; border-color: #B5D4F4; color: #185FA5; }
-
-    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 0; }
-    .btn-row .btn { margin-bottom: 0; }
-
-    .status-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .status-dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      background: #ccc;
-      flex-shrink: 0;
-    }
-    .status-dot.online { background: #639922; }
-    .status-dot.heating { background: #EF9F27; }
-    .status-dot.error { background: #E24B4A; }
-
-    .status-label { font-size: 13px; color: #666; }
-
-    .temp-big {
-      font-size: 48px;
-      font-weight: 500;
-      line-height: 1;
-      margin-bottom: 16px;
-    }
-    .temp-big span { font-size: 20px; color: #888; }
-
-    .metric-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .metric {
-      background: #f5f5f0;
-      border-radius: 8px;
-      padding: 10px;
-    }
-    .metric-label { font-size: 11px; color: #888; margin-bottom: 3px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: flex; flex-direction: column; }
+    #login-screen { align-items: center; justify-content: center; padding: 32px 24px; }
+    .login-logo { font-size: 52px; color: var(--amber); margin-bottom: 12px; text-align: center; }
+    .login-title { font-size: 28px; font-weight: 600; margin-bottom: 4px; text-align: center; }
+    .login-sub { font-size: 14px; color: var(--muted); margin-bottom: 36px; text-align: center; }
+    .login-form { width: 100%; max-width: 360px; }
+    .input-group { position: relative; margin-bottom: 12px; }
+    .input-group i { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--muted); pointer-events: none; }
+    .input-group input { width: 100%; padding: 14px 14px 14px 44px; font-size: 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--card); color: var(--text); outline: none; }
+    .input-group input:focus { border-color: var(--amber); }
+    .login-btn { width: 100%; padding: 15px; font-size: 16px; font-weight: 600; background: var(--amber); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; }
+    .login-btn:disabled { opacity: 0.5; }
+    .login-error { font-size: 13px; color: var(--red); background: var(--red-bg); padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 12px; display: none; }
+    .topbar { background: var(--card); border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 10; }
+    .topbar-icon { font-size: 20px; color: var(--amber); }
+    .topbar h1 { font-size: 17px; font-weight: 600; flex: 1; }
+    .topbar-time { font-size: 12px; color: var(--muted); }
+    .topbar-logout { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 20px; padding: 4px; }
+    .scroll-content { flex: 1; padding: 16px; max-width: 480px; margin: 0 auto; width: 100%; }
+    .status-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 12px; }
+    .status-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .temp-num { font-size: 52px; font-weight: 300; line-height: 1; }
+    .temp-deg { font-size: 22px; color: var(--muted); }
+    .status-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 500; padding: 5px 10px; border-radius: 20px; }
+    .status-badge.heating { background: var(--amber-bg); color: var(--amber); }
+    .status-badge.online { background: var(--green-bg); color: var(--green); }
+    .status-badge.offline { background: var(--bg); color: var(--muted); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+    .metric { background: var(--bg); border-radius: var(--radius-sm); padding: 10px 12px; }
+    .metric-label { font-size: 11px; color: var(--muted); margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
     .metric-value { font-size: 15px; font-weight: 500; }
-
-    .schedule-item {
-      padding: 12px 0;
-      border-bottom: 1px solid #f0f0ec;
-    }
-    .schedule-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .schedule-item:first-child { padding-top: 0; }
-
-    .days-row {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 10px;
-    }
-
-    .day-btn {
-      width: 34px; height: 34px;
-      border-radius: 50%;
-      border: 1px solid #e5e5e0;
-      background: white;
-      font-size: 11px;
-      font-weight: 500;
-      color: #888;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .day-btn.on { background: #378ADD; border-color: #378ADD; color: white; }
-
-    .time-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .add-schedule-btn {
-      width: 100%;
-      padding: 10px;
-      background: none;
-      border: 1px dashed #e5e5e0;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #888;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      margin-top: 8px;
-    }
-    .add-schedule-btn:active { background: #f5f5f0; }
-
-    .remove-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      color: #ccc;
-      font-size: 18px;
-      padding: 4px;
-      margin-left: auto;
-      display: flex;
-    }
-    .remove-btn:active { color: #E24B4A; }
-
-    .alert {
-      font-size: 13px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      margin-top: 8px;
-    }
-    .alert-error { background: #fcebeb; color: #A32D2D; }
-    .alert-success { background: #eaf3de; color: #3B6D11; }
-
-    .temp-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 12px;
-    }
-    .temp-row label { font-size: 14px; }
-    .temp-row input[type=range] { width: 120px; }
-    .temp-row span { font-size: 14px; font-weight: 500; min-width: 40px; text-align: right; }
-
-    .spinner {
-      display: inline-block;
-      width: 14px; height: 14px;
-      border: 2px solid #ddd;
-      border-top-color: #888;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    .temp-selector { display: flex; align-items: center; margin-bottom: 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--bg); }
+    .temp-selector label { font-size: 13px; color: var(--muted); padding: 0 12px; white-space: nowrap; }
+    .temp-selector input[type=range] { flex: 1; margin: 0; border: none; background: none; padding: 10px 0; }
+    .temp-selector span { font-size: 14px; font-weight: 600; padding: 0 12px; min-width: 44px; text-align: right; color: var(--amber); }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .action-btn { padding: 13px; font-size: 14px; font-weight: 500; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--card); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 7px; }
+    .action-btn.sauna-on { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+    .action-btn.light-on { background: var(--blue-bg); border-color: var(--blue); color: var(--blue); }
+    .action-btn:disabled { opacity: 0.4; }
+    .section-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin: 20px 0 8px; }
+    .suntimes-hint { font-size: 12px; color: var(--muted); background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .schedule-card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; margin-bottom: 12px; }
+    .schedule-item { padding: 16px; border-bottom: 1px solid var(--border); }
+    .schedule-item:last-child { border-bottom: none; }
+    .schedule-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .days-row { display: flex; gap: 5px; }
+    .day-btn { width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--border); background: var(--bg); font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .day-btn.on { background: var(--blue); border-color: var(--blue); color: white; }
+    .del-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 18px; padding: 4px; }
+    .time-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .time-group label { font-size: 11px; color: var(--muted); display: block; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .time-group select { width: 100%; padding: 9px 10px; font-size: 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); appearance: none; -webkit-appearance: none; cursor: pointer; }
+    .time-group select:focus { outline: none; border-color: var(--blue); }
+    .offset-wrap { margin-top: 6px; }
+    .offset-wrap select { width: 100%; padding: 7px 10px; font-size: 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--muted); appearance: none; -webkit-appearance: none; }
+    .add-btn { width: 100%; padding: 14px; font-size: 14px; color: var(--muted); background: none; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .save-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; background: var(--amber); color: white; border: none; border-radius: var(--radius-sm); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .save-confirm { font-size: 13px; color: var(--green); text-align: center; padding: 10px; display: none; }
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
-    .sep { color: #888; font-size: 14px; }
-
-    .install-hint {
-      text-align: center;
-      font-size: 12px;
-      color: #aaa;
-      padding: 16px 0 8px;
-    }
+    .bottom-pad { height: 40px; }
   </style>
 </head>
 <body>
-
-<div class="header">
-  <i class="ti ti-flame header-icon" aria-hidden="true"></i>
-  <h1>HUUM Sauna</h1>
-  <span class="header-sub" id="last-update"></span>
+<div id="login-screen" class="screen active">
+  <div class="login-logo"><i class="ti ti-flame" aria-hidden="true"></i></div>
+  <div class="login-title">HUUM Sauna</div>
+  <div class="login-sub">Log in met je HUUM-account</div>
+  <div class="login-form">
+    <div class="input-group">
+      <i class="ti ti-mail" aria-hidden="true"></i>
+      <input type="email" id="login-email" placeholder="E-mailadres" autocomplete="username">
+    </div>
+    <div class="input-group">
+      <i class="ti ti-lock" aria-hidden="true"></i>
+      <input type="password" id="login-pw" placeholder="Wachtwoord" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      <i class="ti ti-plug" aria-hidden="true"></i> Verbinden
+    </button>
+    <div class="login-error" id="login-error"></div>
+  </div>
 </div>
 
-<div class="content">
-
-  <div class="section-gap">
-    <div class="section-title">Verbinding</div>
-    <div class="card">
-      <input type="email" id="email-input" placeholder="Email (HUUM account)" autocomplete="email">
-      <input type="password" id="pw-input" placeholder="Wachtwoord" autocomplete="current-password">
-      <button class="btn" id="connect-btn" onclick="connect()">
-        <i class="ti ti-plug" aria-hidden="true"></i> Verbinden met sauna
-      </button>
-      <div style="display:flex; align-items:center; gap:8px;">
-        <span class="status-dot" id="conn-dot"></span>
-        <span class="status-label" id="conn-status">Vul je gegevens in en klik verbinden</span>
-        <span id="conn-spinner" style="display:none;"><span class="spinner"></span></span>
-      </div>
-      <div id="conn-alert" style="display:none;"></div>
-    </div>
+<div id="main-screen" class="screen">
+  <div class="topbar">
+    <i class="ti ti-flame topbar-icon" aria-hidden="true"></i>
+    <h1>HUUM Sauna</h1>
+    <span class="topbar-time" id="last-update"></span>
+    <button class="topbar-logout" onclick="doLogout()" aria-label="Uitloggen">
+      <i class="ti ti-logout" aria-hidden="true"></i>
+    </button>
   </div>
-
-  <div class="section-gap">
-    <div class="section-title">Status</div>
-    <div class="card">
-      <div class="status-row">
-        <span class="status-dot" id="sauna-dot"></span>
-        <span class="status-label" id="sauna-status-label">—</span>
+  <div class="scroll-content">
+    <div class="status-card">
+      <div class="status-top">
+        <div class="temp-num" id="temp-display">—<span class="temp-deg">°C</span></div>
+        <div id="status-badge" class="status-badge offline"><span class="dot"></span><span id="status-label">—</span></div>
       </div>
-      <div class="temp-big" id="temp-display">—<span> °C</span></div>
-      <div class="metric-grid">
+      <div class="metrics">
         <div class="metric"><div class="metric-label">Deur</div><div class="metric-value" id="door-val">—</div></div>
-        <div class="metric"><div class="metric-label">Doeltemp.</div><div class="metric-value" id="target-val">—</div></div>
-        <div class="metric"><div class="metric-label">Licht</div><div class="metric-value" id="light-val">—</div></div>
+        <div class="metric"><div class="metric-label">Doeltemperatuur</div><div class="metric-value" id="target-val">—</div></div>
       </div>
-      <div class="btn-row">
-        <button class="btn" id="sauna-btn" onclick="toggleSauna()" disabled>
-          <i class="ti ti-flame" aria-hidden="true"></i> <span id="sauna-btn-label">Sauna aan</span>
-        </button>
-        <button class="btn" id="light-btn" onclick="toggleLight()" disabled>
-          <i class="ti ti-bulb" aria-hidden="true"></i> <span id="light-btn-label">Licht aan</span>
-        </button>
-      </div>
-      <div id="status-alert" style="display:none;" class="alert"></div>
-    </div>
-  </div>
-
-  <div class="section-gap">
-    <div class="section-title">Lichtschema's</div>
-    <div class="card">
-      <div id="schedule-list"></div>
-      <button class="add-schedule-btn" onclick="addSchedule()">
-        <i class="ti ti-plus" aria-hidden="true"></i> Schema toevoegen
-      </button>
-    </div>
-  </div>
-
-  <div class="section-gap">
-    <div class="section-title">Instellingen</div>
-    <div class="card">
-      <div class="temp-row">
-        <label>Doeltemperatuur</label>
+      <div class="temp-selector">
+        <label>Instellen</label>
         <input type="range" min="40" max="110" value="80" step="1" id="temp-slider" oninput="document.getElementById('temp-out').textContent=this.value+'°C'">
         <span id="temp-out">80°C</span>
       </div>
-      <div class="temp-row">
-        <label>Status verversen</label>
-        <select id="refresh-select" onchange="setRefreshInterval()" style="width:auto; margin-bottom:0;">
-          <option value="30">30 sec</option>
-          <option value="60" selected>1 min</option>
-          <option value="300">5 min</option>
-        </select>
+      <div class="action-row">
+        <button class="action-btn" id="sauna-btn" onclick="toggleSauna()" disabled>
+          <i class="ti ti-flame" aria-hidden="true"></i><span id="sauna-btn-label">Sauna aan</span>
+        </button>
+        <button class="action-btn" id="light-btn" onclick="toggleLight()" disabled style="display:none;">
+          <i class="ti ti-bulb" aria-hidden="true"></i><span id="light-btn-label">Licht aan</span>
+        </button>
       </div>
     </div>
+    <div class="section-label">Lichtschema's</div>
+    <div class="suntimes-hint">
+      <i class="ti ti-sun" aria-hidden="true" style="font-size:16px;flex-shrink:0;"></i>
+      <span id="suntimes-text">Zontijden worden geladen...</span>
+    </div>
+    <div class="schedule-card">
+      <div id="schedule-list"></div>
+      <button class="add-btn" onclick="addSchedule()">
+        <i class="ti ti-plus" aria-hidden="true"></i> Schema toevoegen
+      </button>
+    </div>
+    <button class="save-btn" onclick="saveSchedules()">
+      <i class="ti ti-device-floppy" aria-hidden="true"></i> Opslaan op server (24/7 actief)
+    </button>
+    <div class="save-confirm" id="save-confirm">Schema's opgeslagen — Railway voert ze 24/7 uit</div>
+    <div class="bottom-pad"></div>
   </div>
-
-  <div class="install-hint">
-    Tip: voeg deze pagina toe aan je homescreen voor app-gevoel 📱
-  </div>
-
 </div>
 
 <script>
-const PROXY = 'https://huum-proxy-production.up.railway.app';
-const DAY_NAMES = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
-let connected = false;
-let lightOn = false;
-let saunaOn = false;
-let refreshTimer = null;
-let scheduleTimer = null;
-let nextId = 1;
-let schedules = [
-  { id: nextId++, days: [1,1,1,1,1,0,0], onTime: '07:00', offTime: '08:00' },
-  { id: nextId++, days: [0,0,0,0,0,1,1], onTime: '09:00', offTime: '22:00' }
-];
+const PROXY='https://huum-proxy-production.up.railway.app';
+const DAYS=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+const TIME_OPTS=[{v:'sunrise',l:'Zonsopgang'},{v:'sunset',l:'Zonsondergang'},
+  ...Array.from({length:24},(_,h)=>[0,15,30,45].map(m=>({
+    v:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'),
+    l:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')
+  }))).flat()];
+const OFFSET_OPTS=[{v:-120,l:'2 uur eerder'},{v:-90,l:'1,5 uur eerder'},{v:-60,l:'1 uur eerder'},
+  {v:-45,l:'45 min eerder'},{v:-30,l:'30 min eerder'},{v:-15,l:'15 min eerder'},
+  {v:0,l:'Exact op tijd'},{v:15,l:'15 min later'},{v:30,l:'30 min later'},
+  {v:45,l:'45 min later'},{v:60,l:'1 uur later'},{v:90,l:'1,5 uur later'},{v:120,l:'2 uur later'}];
 
-function creds() {
-  return {
-    email: document.getElementById('email-input').value.trim(),
-    password: document.getElementById('pw-input').value
-  };
+let connected=false,lightOn=false,saunaOn=false,refreshTimer=null,nextId=1;
+let schedules=[],sunTimes={sunrise:null,sunset:null},userLat=52.37,userLon=4.9;
+
+const sc=k=>{try{return localStorage.getItem(k)}catch(_){return null}};
+const ss=(k,v)=>{try{localStorage.setItem(k,v)}catch(_){}};
+const sr=k=>{try{localStorage.removeItem(k)}catch(_){}};
+const getCreds=()=>({email:sc('huum_e'),password:sc('huum_p')});
+const saveCreds=(e,p)=>{ss('huum_e',e);ss('huum_p',p)};
+const clearCreds=()=>{sr('huum_e');sr('huum_p')};
+const tzOffset=()=>-new Date().getTimezoneOffset();
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const pw=document.getElementById('login-pw').value;
+  if(!email||!pw){showErr('Vul je e-mailadres en wachtwoord in');return;}
+  const btn=document.getElementById('login-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span>';
+  try{
+    const res=await fetch(`${PROXY}/status?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pw)}`);
+    const data=await res.json();
+    if(res.ok){
+      saveCreds(email,pw);connected=true;
+      showScreen('main-screen');
+      updateStatusUI(data);updateTime();
+      loadSchedules(email);getLocation();startRefresh();
+    } else showErr(data.error||'Controleer je e-mailadres en wachtwoord');
+  }catch(_){showErr('Kan de server niet bereiken');}
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-plug"></i> Verbinden';
 }
 
-function showAlert(id, msg, type) {
-  const el = document.getElementById(id);
-  el.className = 'alert alert-' + type;
-  el.textContent = msg;
-  el.style.display = 'block';
-  setTimeout(() => el.style.display = 'none', 4000);
+function showErr(msg){const el=document.getElementById('login-error');el.textContent=msg;el.style.display='block';}
+
+function doLogout(){
+  clearCreds();connected=false;
+  if(refreshTimer)clearInterval(refreshTimer);
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pw').value='';
+  document.getElementById('login-error').style.display='none';
+  showScreen('login-screen');
 }
 
-function updateLastUpdate() {
-  const now = new Date();
-  document.getElementById('last-update').textContent =
-    'Bijgewerkt ' + now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
+function updateTime(){const n=new Date();document.getElementById('last-update').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+
+function updateStatusUI(data){
+  const labels={230:'Offline',231:'Aan het verwarmen',232:'Online',233:'Bezet',400:'Noodstop'};
+  document.getElementById('status-label').textContent=labels[data.statusCode]||'—';
+  const b=document.getElementById('status-badge');
+  b.className='status-badge '+(data.statusCode===231?'heating':data.statusCode===232?'online':'offline');
+  saunaOn=data.statusCode===231;
+  document.getElementById('sauna-btn').className='action-btn'+(saunaOn?' sauna-on':'');
+  document.getElementById('sauna-btn-label').textContent=saunaOn?'Sauna uit':'Sauna aan';
+  document.getElementById('sauna-btn').disabled=false;
+  if(data.temperature)document.getElementById('temp-display').innerHTML=data.temperature+'<span class="temp-deg">°C</span>';
+  document.getElementById('door-val').textContent=data.door?'Dicht':'Open';
+  document.getElementById('target-val').textContent=data.targetTemperature?data.targetTemperature+'°C':'—';
+  const hasLight=data.config===2||data.config===3;
+  document.getElementById('light-btn').style.display=hasLight?'flex':'none';
+  document.getElementById('light-btn').disabled=false;
 }
 
-async function connect() {
-  const { email, password } = creds();
-  if (!email || !password) { showAlert('conn-alert', 'Vul email en wachtwoord in', 'error'); return; }
-  document.getElementById('conn-spinner').style.display = 'inline';
-  document.getElementById('conn-status').textContent = 'Verbinding maken...';
-  document.getElementById('connect-btn').disabled = true;
-  try {
-    const res = await fetch(`${PROXY}/status?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
-    const data = await res.json();
-    if (res.ok) {
-      connected = true;
-      document.getElementById('conn-dot').className = 'status-dot online';
-      document.getElementById('conn-status').textContent = 'Verbonden';
-      document.getElementById('connect-btn').className = 'btn btn-connected';
-      document.getElementById('connect-btn').innerHTML = '<i class="ti ti-check"></i> Verbonden';
-      document.getElementById('sauna-btn').disabled = false;
-      document.getElementById('light-btn').disabled = false;
-      updateStatusUI(data);
-      updateLastUpdate();
-      setRefreshInterval();
-      startScheduleChecker();
-    } else {
-      document.getElementById('conn-dot').className = 'status-dot error';
-      document.getElementById('conn-status').textContent = 'Verbinding mislukt';
-      document.getElementById('connect-btn').disabled = false;
-      showAlert('conn-alert', data.error || 'Controleer je gegevens', 'error');
+async function fetchStatus(){if(!connected)return;const{email,password}=getCreds();try{const res=await fetch(`${PROXY}/status?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);if(res.ok){updateStatusUI(await res.json());updateTime();}}catch(_){}}
+function startRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(fetchStatus,60000);}
+
+async function toggleSauna(){
+  const{email,password}=getCreds();
+  const temp=parseInt(document.getElementById('temp-slider').value);
+  const ep=saunaOn?'/stop':'/start';
+  const body=saunaOn?{email,password}:{email,password,targetTemperature:temp};
+  document.getElementById('sauna-btn').disabled=true;
+  try{const res=await fetch(PROXY+ep,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(res.ok)updateStatusUI(await res.json());}catch(_){}
+  document.getElementById('sauna-btn').disabled=false;
+}
+
+async function toggleLight(){
+  const{email,password}=getCreds();lightOn=!lightOn;
+  document.getElementById('light-btn').className='action-btn'+(lightOn?' light-on':'');
+  document.getElementById('light-btn-label').textContent=lightOn?'Licht uit':'Licht aan';
+  try{await fetch(PROXY+'/light',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});}catch(_){}
+}
+
+function getLocation(){if(!navigator.geolocation)return fetchSunTimes();navigator.geolocation.getCurrentPosition(p=>{userLat=p.coords.latitude;userLon=p.coords.longitude;fetchSunTimes();},()=>fetchSunTimes());}
+
+async function fetchSunTimes(){
+  try{
+    const res=await fetch(`${PROXY}/suntimes?lat=${userLat}&lon=${userLon}&tzOffset=${tzOffset()}`);
+    if(res.ok){sunTimes=await res.json();document.getElementById('suntimes-text').textContent='Zonsopgang '+sunTimes.sunrise+' · Zonsondergang '+sunTimes.sunset+' (vandaag)';renderSchedules();}
+  }catch(_){}
+}
+
+async function loadSchedules(email){
+  try{
+    const res=await fetch(`${PROXY}/schedules?email=${encodeURIComponent(email)}`);
+    if(res.ok){
+      const data=await res.json();
+      if(data.schedules&&data.schedules.length){schedules=data.schedules;nextId=Math.max(...schedules.map(s=>s.id),0)+1;}
+      else{schedules=[{id:nextId++,days:[0,0,0,0,0,1,1],onTime:'sunset',onOffset:-60,offTime:'23:00',offOffset:0}];}
+      renderSchedules();
     }
-  } catch(e) {
-    document.getElementById('conn-dot').className = 'status-dot error';
-    document.getElementById('conn-status').textContent = 'Proxy niet bereikbaar';
-    document.getElementById('connect-btn').disabled = false;
-    showAlert('conn-alert', 'Kan proxy niet bereiken', 'error');
-  }
-  document.getElementById('conn-spinner').style.display = 'none';
+  }catch(_){schedules=[{id:nextId++,days:[0,0,0,0,0,1,1],onTime:'sunset',onOffset:-60,offTime:'23:00',offOffset:0}];renderSchedules();}
 }
 
-function updateStatusUI(data) {
-  const codes = {
-    230: 'Offline',
-    231: 'Aan het verwarmen 🔥',
-    232: 'Online, niet aan het verwarmen',
-    233: 'Bezet door andere gebruiker',
-    400: 'Noodstop actief'
-  };
-  document.getElementById('sauna-status-label').textContent = codes[data.statusCode] || 'Status onbekend';
-  const dot = document.getElementById('sauna-dot');
-  dot.className = 'status-dot' + (data.statusCode === 231 ? ' heating' : data.statusCode === 232 ? ' online' : ' error');
-  saunaOn = data.statusCode === 231;
-  document.getElementById('sauna-btn').className = 'btn' + (saunaOn ? ' btn-sauna-on' : '');
-  document.getElementById('sauna-btn-label').textContent = saunaOn ? 'Sauna uit' : 'Sauna aan';
-  if (data.temperature) {
-    document.getElementById('temp-display').innerHTML = data.temperature + '<span> °C</span>';
-  }
-  document.getElementById('door-val').textContent = data.door ? 'Dicht' : 'Open';
-  document.getElementById('target-val').textContent = data.targetTemperature ? data.targetTemperature + '°C' : '—';
-  const hasLight = data.config === 2 || data.config === 3;
-  document.getElementById('light-btn').style.display = hasLight ? 'flex' : 'none';
-  document.getElementById('light-val').textContent = hasLight ? (lightOn ? 'Aan' : 'Uit') : 'N.v.t.';
+async function saveSchedules(){
+  const{email,password}=getCreds();
+  const btn=document.querySelector('.save-btn');
+  btn.disabled=true;btn.innerHTML='<span class="spinner"></span> Opslaan...';
+  try{
+    const res=await fetch(PROXY+'/schedules',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password,schedules,lat:userLat,lon:userLon,tzOffset:tzOffset()})});
+    if(res.ok){const c=document.getElementById('save-confirm');c.style.display='block';setTimeout(()=>c.style.display='none',4000);}
+  }catch(_){}
+  btn.disabled=false;btn.innerHTML='<i class="ti ti-device-floppy"></i> Opslaan op server (24/7 actief)';
 }
 
-async function fetchStatus() {
-  if (!connected) return;
-  const { email, password } = creds();
-  try {
-    const res = await fetch(`${PROXY}/status?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
-    if (res.ok) { updateStatusUI(await res.json()); updateLastUpdate(); }
-  } catch(e) {}
+function setField(id,field,value){const s=schedules.find(x=>x.id===id);if(s)s[field]=value;}
+function toggleDay(id,idx){const s=schedules.find(x=>x.id===id);if(s){s.days[idx]=s.days[idx]?0:1;renderSchedules();}}
+function addSchedule(){schedules.push({id:nextId++,days:[0,0,0,0,0,0,0],onTime:'sunset',onOffset:-60,offTime:'23:00',offOffset:0});renderSchedules();}
+function removeSchedule(id){schedules=schedules.filter(s=>s.id!==id);renderSchedules();}
+
+function timeSelect(schedId,field){
+  const s=schedules.find(x=>x.id===schedId);
+  const val=s[field];
+  const isSun=val==='sunrise'||val==='sunset';
+  const offsetField=field==='onTime'?'onOffset':'offOffset';
+  const offsetVal=s[offsetField]||0;
+  return '<select onchange="setField('+schedId+',' + "'"+field+"'" + ',this.value);renderSchedules()">'+
+    TIME_OPTS.map(o=>'<option value="'+o.v+'"'+(o.v===val?' selected':'')+'>'+o.l+'</option>').join('')+
+    '</select>'+
+    (isSun?'<div class="offset-wrap"><select onchange="setField('+schedId+',' + "'"+offsetField+"'" + ',parseInt(this.value))">'+
+      OFFSET_OPTS.map(o=>'<option value="'+o.v+'"'+(o.v===offsetVal?' selected':'')+'>'+o.l+'</option>').join('')+
+      '</select></div>':'');
 }
 
-function setRefreshInterval() {
-  if (refreshTimer) clearInterval(refreshTimer);
-  if (!connected) return;
-  const ms = parseInt(document.getElementById('refresh-select').value) * 1000;
-  refreshTimer = setInterval(fetchStatus, ms);
+function renderSchedules(){
+  const list=document.getElementById('schedule-list');
+  if(!schedules.length){list.innerHTML='<p style="font-size:13px;color:var(--muted);padding:16px;">Geen schema\'s</p>';return;}
+  list.innerHTML=schedules.map(s=>
+    '<div class="schedule-item">'+
+    '<div class="schedule-header"><div class="days-row">'+
+    DAYS.map((d,i)=>'<button class="day-btn'+(s.days[i]?' on':'')+'" onclick="toggleDay('+s.id+','+i+')">'+d+'</button>').join('')+
+    '</div><button class="del-btn" onclick="removeSchedule('+s.id+')" aria-label="Verwijder"><i class="ti ti-trash" aria-hidden="true"></i></button></div>'+
+    '<div class="time-cols">'+
+    '<div class="time-group"><label>Licht aan</label>'+timeSelect(s.id,'onTime')+'</div>'+
+    '<div class="time-group"><label>Licht uit</label>'+timeSelect(s.id,'offTime')+'</div>'+
+    '</div></div>'
+  ).join('');
 }
 
-async function toggleSauna() {
-  if (!connected) return;
-  const { email, password } = creds();
-  const temp = parseInt(document.getElementById('temp-slider').value);
-  const endpoint = saunaOn ? '/stop' : '/start';
-  const body = saunaOn ? { email, password } : { email, password, targetTemperature: temp };
-  try {
-    const res = await fetch(PROXY + endpoint, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(body)
-    });
-    const data = await res.json();
-    if (res.ok) { updateStatusUI(data); }
-    else { showAlert('status-alert', data.error || 'Actie mislukt', 'error'); }
-  } catch(e) { showAlert('status-alert', 'Verbindingsfout', 'error'); }
-}
-
-async function toggleLight() {
-  if (!connected) return;
-  const { email, password } = creds();
-  lightOn = !lightOn;
-  try {
-    const res = await fetch(PROXY + '/light', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ email, password, on: lightOn })
-    });
-    if (res.ok) {
-      document.getElementById('light-btn').className = 'btn' + (lightOn ? ' btn-light-on' : '');
-      document.getElementById('light-btn-label').textContent = lightOn ? 'Licht uit' : 'Licht aan';
-      document.getElementById('light-val').textContent = lightOn ? 'Aan' : 'Uit';
-    } else {
-      lightOn = !lightOn;
-      showAlert('status-alert', 'Licht kon niet worden geschakeld', 'error');
-    }
-  } catch(e) { lightOn = !lightOn; showAlert('status-alert', 'Verbindingsfout', 'error'); }
-}
-
-function startScheduleChecker() {
-  if (scheduleTimer) clearInterval(scheduleTimer);
-  scheduleTimer = setInterval(checkSchedules, 30000);
-}
-
-function checkSchedules() {
-  if (!connected) return;
-  const now = new Date();
-  const dayIdx = (now.getDay() + 6) % 7;
-  const hhmm = now.getHours().toString().padStart(2,'0') + ':' + now.getMinutes().toString().padStart(2,'0');
-  schedules.forEach(s => {
-    if (!s.days[dayIdx]) return;
-    if (hhmm === s.onTime && !lightOn) toggleLight();
-    if (hhmm === s.offTime && lightOn) toggleLight();
-  });
-}
-
-function addSchedule() {
-  schedules.push({ id: nextId++, days: [0,0,0,0,0,0,0], onTime: '18:00', offTime: '22:00' });
-  renderSchedules();
-}
-
-function removeSchedule(id) {
-  schedules = schedules.filter(s => s.id !== id);
-  renderSchedules();
-}
-
-function toggleDay(schedId, dayIdx) {
-  const s = schedules.find(s => s.id === schedId);
-  if (s) s.days[dayIdx] = s.days[dayIdx] ? 0 : 1;
-  renderSchedules();
-}
-
-function renderSchedules() {
-  const list = document.getElementById('schedule-list');
-  if (!schedules.length) {
-    list.innerHTML = '<p style="font-size:13px; color:#aaa; padding:8px 0;">Geen schema\'s — voeg er een toe.</p>';
-    return;
-  }
-  list.innerHTML = schedules.map(s => `
-    <div class="schedule-item">
-      <div style="display:flex; align-items:center; margin-bottom:10px;">
-        <div class="days-row" style="margin-bottom:0; flex:1;">
-          ${DAY_NAMES.map((d, i) => `
-            <button class="day-btn ${s.days[i] ? 'on' : ''}" onclick="toggleDay(${s.id},${i})">${d}</button>
-          `).join('')}
-        </div>
-        <button class="remove-btn" onclick="removeSchedule(${s.id})" aria-label="Verwijder">
-          <i class="ti ti-trash" aria-hidden="true"></i>
-        </button>
-      </div>
-      <div class="time-row">
-        <i class="ti ti-bulb" style="font-size:16px; color:#888;" aria-hidden="true"></i>
-        <input type="time" value="${s.onTime}" onchange="schedules.find(x=>x.id===${s.id}).onTime=this.value" style="width:110px;">
-        <span class="sep">→</span>
-        <i class="ti ti-bulb-off" style="font-size:16px; color:#888;" aria-hidden="true"></i>
-        <input type="time" value="${s.offTime}" onchange="schedules.find(x=>x.id===${s.id}).offTime=this.value" style="width:110px;">
-      </div>
-    </div>
-  `).join('');
-}
-
-renderSchedules();
+window.addEventListener('load',()=>{
+  const{email,password}=getCreds();
+  if(email&&password){document.getElementById('login-email').value=email;document.getElementById('login-pw').value=password;doLogin();}
+});
 </script>
 </body>
 </html>
