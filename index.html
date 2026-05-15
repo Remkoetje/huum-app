@@ -214,6 +214,11 @@ function doLogout(){
 
 function updateTime(){const n=new Date();document.getElementById('last-update').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
 
+function updateLightBtn(){
+  document.getElementById('light-btn').className='action-btn'+(lightOn?' light-on':'');
+  document.getElementById('light-btn-label').textContent=lightOn?'Licht uit':'Licht aan';
+}
+
 function updateStatusUI(data){
   const labels={230:'Offline',231:'Aan het verwarmen',232:'Online',233:'Bezet',400:'Noodstop'};
   document.getElementById('status-label').textContent=labels[data.statusCode]||'—';
@@ -229,9 +234,21 @@ function updateStatusUI(data){
   const hasLight=data.config===2||data.config===3;
   document.getElementById('light-btn').style.display=hasLight?'flex':'none';
   document.getElementById('light-btn').disabled=false;
+  // Echte lichtstatus uit API
+  if(data.light!==undefined){
+    lightOn=data.light===1;
+    updateLightBtn();
+  }
 }
 
-async function fetchStatus(){if(!connected)return;const{email,password}=getCreds();try{const res=await fetch(`${PROXY}/status?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);if(res.ok){updateStatusUI(await res.json());updateTime();}}catch(_){}}
+async function fetchStatus(){
+  if(!connected)return;
+  const{email,password}=getCreds();
+  try{
+    const res=await fetch(`${PROXY}/status?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+    if(res.ok){updateStatusUI(await res.json());updateTime();}
+  }catch(_){}
+}
 function startRefresh(){if(refreshTimer)clearInterval(refreshTimer);refreshTimer=setInterval(fetchStatus,60000);}
 
 async function toggleSauna(){
@@ -245,12 +262,25 @@ async function toggleSauna(){
 }
 
 async function toggleLight(){
-  const{email,password}=getCreds();lightOn=!lightOn;
-  document.getElementById('light-btn').className='action-btn'+(lightOn?' light-on':'');
-  document.getElementById('light-btn-label').textContent=lightOn?'Licht uit':'Licht aan';
-  try{await fetch(PROXY+'/light',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});}catch(_){}
+  const{email,password}=getCreds();
+  const wantOn=!lightOn; // gewenste nieuwe stand
+  document.getElementById('light-btn').disabled=true;
+  try{
+    // Haal eerst actuele status op
+    const statusRes=await fetch(`${PROXY}/status?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+    if(statusRes.ok){
+      const status=await statusRes.json();
+      const currentlyOn=status.light===1;
+      // Alleen togglen als de huidige stand niet overeenkomt met wat we willen
+      if(currentlyOn!==wantOn){
+        await fetch(PROXY+'/light',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+      }
+      lightOn=wantOn;
+      updateLightBtn();
+    }
+  }catch(_){}
+  document.getElementById('light-btn').disabled=false;
 }
-
 
 async function fetchSunTimes(){
   try{
